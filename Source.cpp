@@ -9,8 +9,8 @@ HMODULE FindTargetModule ( HANDLE targetProcess ) {
 
     for ( DWORD i = 0; i < numModules; i++ ) {
         TCHAR moduleName[ MAX_PATH ];
-		if ( GetModuleBaseName ( targetProcess, modules[ i ], moduleName, MAX_PATH ) && 
-            hashcmp ( moduleName, DLL_NAME ) )
+		if ( GetModuleBaseName ( targetProcess, modules[ i ], moduleName, MAX_PATH ) &&
+			 hashcmp ( (const wchar_t*)moduleName, DLL_NAME ) )
 			return modules[ i ];
     }
     exit ( 2 );
@@ -26,11 +26,11 @@ DWORD FindTargetProcessId ( ) {
 
     Process32First ( snapshot, &processEntry );
     do {
-        if ( hashcmp ( processEntry.szExeFile, PROCESS_NAME ) ) {
-            CloseHandle ( snapshot );
+		if ( hashcmp ( (const wchar_t*)processEntry.szExeFile, PROCESS_NAME ) ) {
+			CloseHandle ( snapshot );
             return processEntry.th32ProcessID;
-        }
-    } while ( Process32Next ( snapshot, &processEntry ) );
+		}
+	} while ( Process32Next ( snapshot, &processEntry ) );
 
     CloseHandle ( snapshot );
     exit ( 4 );
